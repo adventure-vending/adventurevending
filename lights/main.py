@@ -6,9 +6,17 @@ class Main():
     def test(self):
         self.init_machine()
         print "started"
-        #LightSystemManager.open_box(1)
+        LightSystemManager.select_box(1)
+        LightSystemManager.open_box(1)
         sleep(4)
         LightSystemManager.select_box(2)
+        LightSystemManager.open_box(2)
+        sleep(25)
+        LightSystemManager.select_box(3)
+        LightSystemManager.open_box(3)
+        sleep(6)
+        LightSystemManager.select_box(4)
+        LightSystemManager.open_box(4)
         sleep(999)
         print "ending.."
         self.cleanup()

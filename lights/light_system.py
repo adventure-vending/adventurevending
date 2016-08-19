@@ -21,7 +21,6 @@ class LightSystem(multiprocessing.Process):
         #The PowerSupply class inherits from list
         self.pds = PowerSupply("192.168.1.120")
         self.box = 0
-        #TODO, read from config file that includes fixures and starting addresses,
         #TODO, create simple UI for setting number of fixtures and addresses
 
         # address light fixtures using lowest dmx address
@@ -48,8 +47,9 @@ class LightSystem(multiprocessing.Process):
 
     def idle(self):
         pause=.1
-        steps=255
+        steps=1000
         div = steps / len(self.pds)
+        print "starting idle"
         for step in range(steps):
             ratio = 0
             for idx, fixture in enumerate(self.pds):
@@ -64,9 +64,10 @@ class LightSystem(multiprocessing.Process):
 
     def open_box(self, box):
         pause=.1
-        steps= 10
+        steps= 1000
         div = steps / len(self.pds)
         box = box -1
+        print "box opened {}".format(box)
         for step in range(steps):
             ratio = 0
             for idx, fixture in enumerate(self.pds):
@@ -81,14 +82,14 @@ class LightSystem(multiprocessing.Process):
             print self.pds
             self.pds.go()
             time.sleep(pause)
-        print "box opened {}".format(box)
         sys.stdout.flush()
 
     def select_box(self, box):
         pause=.1
-        steps= 255
+        steps= 1000
         div = steps / len(self.pds)
         box = box -1
+        print "box selected {}".format(box)
         for step in range(steps):
             ratio = 0
             for idx, fixture in enumerate(self.pds):
@@ -103,5 +104,4 @@ class LightSystem(multiprocessing.Process):
             print self.pds
             self.pds.go()
             time.sleep(pause)
-        print "box selected {}".format(box)
         sys.stdout.flush()
