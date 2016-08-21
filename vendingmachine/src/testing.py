@@ -1,16 +1,18 @@
 import RPi.GPIO as GPIO
 import time
+import datetime
 import threading
 import imp
 import random
 import textwrap
-import ..lights
+# import ..lights
 from vendingmachine.src.printer import Printer
 from vendingmachine.src.coinmachine import CoinMachine
 from vendingmachine.src.lightingcontroller import LightingController
 from vendingmachine.src.binaryboxcontroller import BinaryBoxController
 from vendingmachine.src.binaryknob import BinaryKnob
 from vendingmachine.src.addeventdetection import *
+from vendingmachine.src.input.button import Button
 from logger.logger import Logger
 import api.run
 
@@ -30,7 +32,8 @@ class VendingMachine(object):
     price_pins = [33,35,37]
     #Change this to False to use in the real vending machine
     #Leave as True to use the demo box with three buttons
-    demo_mode = True
+    demo_mode = False
+    random_box_mode = False
 
     print_adventures = True
 
@@ -45,6 +48,7 @@ class VendingMachine(object):
 
     adventure_count = 0
     gift_count = 0
+    adv_types = [["bmapi", 100], ["google_sheet", 0]]
 
     def __init__(self):
         GPIO.cleanup()
@@ -118,12 +122,27 @@ class VendingMachine(object):
 
     def __gift_button_pressed(self, pin):
         self.logger.log("Machine: gift Button Pressed")
-        selector_a = self.adventure_knob_a.get_value()
-        selector_b = self.adventure_knob_b.get_value()
-        #TODO Add some logic here deciding how these two knobs pick a box
-        self.logger.log("  opening box at %s" % selector_a)
-        self.open_prize_box(selector_a)
+        box_number = self.adventure_knob_a.get_value()
+        wall_number = self.adventure_knob_b.get_value()
+        if box_number > 4 or self.random_box_mode == True:
+            #random box number if nothing is selected
+            box_number = random.randint(1,4)
+        if wall_number > 7 or self.random_box_mode == True:
+            #random wall number if nothing is selected
+            wall_number = random.randint(1,4)
+        latch_number = ((wall_number - 1) * 4) + box_number
+        self.logger.log("  selected box %s" % latch_number)
+        self.open_prize_box(latch_number)
 
+    def __weighted_choice(self, choices):
+            total = sum(w for c, w in choices)
+            r = random.uniform(0, total)
+            upto = 0
+            for c,w in choices:
+                if upto + w >= r:
+                    return c
+                upto += w
+            assert False, "Shouldn't get here"  
 
     # Public --------------------------------------------
 
@@ -132,9 +151,10 @@ class VendingMachine(object):
         #For now, all boxes cost one. TODO: Hook this up with prices
         box_cost = 1
         if (self.coin_machine.current_value >= box_cost):
+        #if (True):
             self.logger.log("  Signalling to open box %s" % box_number)
             self.box_controller.set_box(box_number)
-            lights.LightSystemManager.open_box()
+            # lights.LightSystemManager.open_box()
             self.box_controller.open_current_box()
             self.lighting.dispense_prize(box_number)
             self.gift_count = self.gift_count + 1
@@ -145,12 +165,31 @@ class VendingMachine(object):
             t.start()
 
     def get_adventure(self):
-        adventures = api.run.av_data["adventures"]
-        enabled_adventures = []
-
-        for adventure in adventures:
-            if (not 'enabled' in adventure) or adventure['enabled'] == True:
-                enabled_adventures.append(adventure)
+        adventures = api.run.av_data
+        enabled_adventures = []            
+        adv_type = self.__weighted_choice(self.adv_types)
+        time_format = '%Y-%m-%dT%X+00:00'
+        #now = datetime.datetime.now()
+        now = datetime.datetime.strptime("2016-09-02T18:00:00+00:00", time_format)
+        
+        for adventureid in adventures:
+            adventure = adventures[adventureid]
+            if ('enabled' in adventure) and adventure['enabled'] == False:
+                continue
+            if adventure['event_source'] != adv_type:
+                continue
+            if 'occurrence_set' in adventure:
+                cont = False
+                for event_time in adventure['occurrence_set']:
+                    start_time = datetime.datetime.strptime(event_time["start_time"], time_format)
+                    start_time_minus_hour = start_time - datetime.timedelta(hours=1)
+                    end_time = datetime.datetime.strptime(event_time["end_time"], time_format)
+                    if now < (start_time - datetime.timedelta(hours=1)) or now > (end_time - datetime.timedelta(hours=1)):
+                        cont = True
+                if cont:
+                    continue
+      
+            enabled_adventures.append(adventure)
 
         return random.choice(enabled_adventures)
 

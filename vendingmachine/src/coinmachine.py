@@ -27,7 +27,9 @@ class CoinMachine(object):
 
     def __init__(self, lighting, demo_mode=False):
         self.logger = Logger()
-        self.demo_mode = demo_mode
+        #self.demo_mode = demo_mode
+        #For now, lets leave it as only counting one coin.
+        self.demo_mode = True
         self.lighting = lighting
         GPIO.setup(self.coin_counter_pins, GPIO.OUT)
         GPIO.setup(self.coin_input_pin, GPIO.IN)
