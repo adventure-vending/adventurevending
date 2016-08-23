@@ -14,7 +14,6 @@ Use control + F to search
   <button class="btn btn-secondary" {{action toggleProperty 'viewConfig.showDescription'}}>Toggle Description</button>
   <button class="btn btn-secondary" {{action toggleProperty 'viewConfig.showLocation'}}>Toggle Location</button>
   <button class="btn btn-secondary" {{action toggleProperty 'viewConfig.showType'}}>Toggle Type</button>
-  <button class="btn btn-secondary" {{action toggleProperty 'viewConfig.showCoin'}}>Toggle Coin</button>
   <button class="btn btn-secondary" {{action toggleProperty 'viewConfig.showEnabled'}}>Toggle Enabled</button>
 </div>
 
@@ -32,9 +31,6 @@ Use control + F to search
       {{/if}}
       {{#if viewConfig.showType}}
         {{#column-head sort=(action "sort") sortBy="type" currentSort=currentSort}}Type{{/column-head}}
-      {{/if}}
-      {{#if viewConfig.showCoin}}
-        {{#column-head sort=(action "sort") sortBy="coin" currentSort=currentSort}}Coin{{/column-head}}
       {{/if}}
       {{#if viewConfig.showEnabled}}
         {{#column-head sort=(action "sort") sortBy="enabled" currentSort=currentSort}}Enabled{{/column-head}}
@@ -81,9 +77,6 @@ Use control + F to search
             placeholder="Type"
             value=newAdventure.type}}
         </td>
-      {{/if}}
-      {{#if viewConfig.showCoin}}
-        <td></td>
       {{/if}}
       {{#if viewConfig.showEnabled}}
         <td></td>

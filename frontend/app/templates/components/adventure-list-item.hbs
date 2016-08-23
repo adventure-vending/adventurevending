@@ -31,13 +31,6 @@
         value=attrs.adventure.type}}
     </td>
   {{/if}}
-  {{#if attrs.viewConfig.showCoin}}
-    <td>
-      {{input
-        type="checkbox"
-        checked=attrs.adventure.coin}}
-    </td>
-  {{/if}}
   {{#if attrs.viewConfig.showEnabled}}
     <td>
       {{input
@@ -63,11 +56,6 @@
   {{/if}}
   {{#if attrs.viewConfig.showType}}
     <td>{{attrs.adventure.type}}</td>
-  {{/if}}
-  {{#if attrs.viewConfig.showCoin}}
-    <td>
-      <input type="checkbox" disabled checked={{attrs.adventure.coin}}>
-    </td>
   {{/if}}
   {{#if attrs.viewConfig.showEnabled}}
     <td>

@@ -1,7 +1,6 @@
 import cups
 import os
 from vendingmachine.src.adventure import Adventure
-from vendingmachine.src.coinadventure import CoinAdventure
 import threading
 from logger.logger import Logger
 
@@ -39,10 +38,7 @@ class Printer(object):
         title = adventure["title"].replace("\\n", "\n")
         desc = adventure["desc"].replace("\\n", "\n")
 
-        if "coin" in adventure and adventure['coin'] == True:
-            pdf = CoinAdventure()
-        else:
-            pdf = Adventure()
+        pdf = Adventure()
         pdf.set_margins(left=18, top=0, right=0)
         pdf.set_auto_page_break(False)
 
