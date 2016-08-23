@@ -1,0 +1,20 @@
+@import 'adventure-list-item';
+
+.adventure-list {
+  .glyphicon {
+    opacity: 0.2;
+    transition: opacity 500ms;
+  }
+
+  .glyphicon:hover {
+    opacity: 1;
+
+    &.glyphicon-plus {
+      color: green;
+    }
+  }
+
+  input[type="text"] {
+    width: 100%;
+  }
+}

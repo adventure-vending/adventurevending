@@ -1,0 +1,12 @@
+.column-head {
+  white-space: nowrap;
+
+  &:hover .glyphicon {
+    opacity: 1;
+  }
+
+  .icon-placeholder {
+    display: inline-block;
+    width: 14px;
+  }
+}

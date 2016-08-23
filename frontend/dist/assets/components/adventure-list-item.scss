@@ -1,0 +1,27 @@
+.adventure-list-item {
+  .glyphicon {
+    opacity: 0.2;
+    transition: opacity 500ms;
+  }
+
+  .glyphicon:hover {
+    opacity: 1;
+
+    &.glyphicon-trash {
+      color: red;
+    }
+    &.glyphicon-remove {
+      color: orange;
+    }
+    &.glyphicon-pencil {
+      color: blue;
+    }
+    &.glyphicon-ok {
+      color: green;
+    }
+  }
+
+  input[type="text"] {
+    width: 100%;
+  }
+}
