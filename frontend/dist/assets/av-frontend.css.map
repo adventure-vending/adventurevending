@@ -1,0 +1,20 @@
+{
+	"version": 3,
+	"file": "av-frontend.css",
+	"sources": [
+		"../../sass_compiler-input_base_path-UzEhjLSh.tmp/0/app/styles/app.scss",
+		"../../sass_compiler-input_base_path-UzEhjLSh.tmp/0/app/styles/components/adventure-list.scss",
+		"../../sass_compiler-input_base_path-UzEhjLSh.tmp/0/app/styles/components/adventure-list-item.scss",
+		"../../sass_compiler-input_base_path-UzEhjLSh.tmp/0/app/styles/components/column-head.scss",
+		"../../sass_compiler-input_base_path-UzEhjLSh.tmp/0/app/styles/components/bootstrap/bootstrap-dropdown.scss"
+	],
+	"sourcesContent": [
+		"@import 'components/adventure-list';\n@import 'components/column-head';\n@import 'components/bootstrap/bootstrap-dropdown';\n",
+		"@import 'adventure-list-item';\n\n.adventure-list {\n  .glyphicon {\n    opacity: 0.2;\n    transition: opacity 500ms;\n  }\n\n  .glyphicon:hover {\n    opacity: 1;\n\n    &.glyphicon-plus {\n      color: green;\n    }\n  }\n\n  input[type=\"text\"] {\n    width: 100%;\n  }\n}",
+		".adventure-list-item {\n  .glyphicon {\n    opacity: 0.2;\n    transition: opacity 500ms;\n  }\n\n  .glyphicon:hover {\n    opacity: 1;\n\n    &.glyphicon-trash {\n      color: red;\n    }\n    &.glyphicon-remove {\n      color: orange;\n    }\n    &.glyphicon-pencil {\n      color: blue;\n    }\n    &.glyphicon-ok {\n      color: green;\n    }\n  }\n\n  input[type=\"text\"] {\n    width: 100%;\n  }\n}\n",
+		".column-head {\n  white-space: nowrap;\n\n  &:hover .glyphicon {\n    opacity: 1;\n  }\n\n  .icon-placeholder {\n    display: inline-block;\n    width: 14px;\n  }\n}",
+		".bootstrap-dropdown {\n  .dropdown-menu {\n    display: block; //override bootstrap\n  }\n}"
+	],
+	"mappings": "AEAA,AACE,oBADkB,CAClB,UAAU,CAAC;EACT,OAAO,EAAE,GAAI;EACb,UAAU,EAAE,aAAc,GAC3B;;AAJH,AAMY,oBANQ,CAMlB,UAAU,AAAA,MAAM,CAAC;EACf,OAAO,EAAE,CAAE,GAcZ;EArBH,AAMY,oBANQ,CAMlB,UAAU,AAAA,MAAM,AAGb,gBAAgB,CAAC;IAChB,KAAK,EAAE,GAAI,GACZ;EAXL,AAMY,oBANQ,CAMlB,UAAU,AAAA,MAAM,AAMb,iBAAiB,CAAC;IACjB,KAAK,EAAE,MAAO,GACf;EAdL,AAMY,oBANQ,CAMlB,UAAU,AAAA,MAAM,AASb,iBAAiB,CAAC;IACjB,KAAK,EAAE,IAAK,GACb;EAjBL,AAMY,oBANQ,CAMlB,UAAU,AAAA,MAAM,AAYb,aAAa,CAAC;IACb,KAAK,EAAE,KAAM,GACd;;AApBL,AAuBmB,oBAvBC,CAuBlB,KAAK,CAAA,AAAA,IAAC,CAAK,MAAM,AAAX,EAAa;EACjB,KAAK,EAAE,IAAK,GACb;;ADvBH,AACE,eADa,CACb,UAAU,CAAC;EACT,OAAO,EAAE,GAAI;EACb,UAAU,EAAE,aAAc,GAC3B;;AAJH,AAMY,eANG,CAMb,UAAU,AAAA,MAAM,CAAC;EACf,OAAO,EAAE,CAAE,GAKZ;EAZH,AAMY,eANG,CAMb,UAAU,AAAA,MAAM,AAGb,eAAe,CAAC;IACf,KAAK,EAAE,KAAM,GACd;;AAXL,AAcmB,eAdJ,CAcb,KAAK,CAAA,AAAA,IAAC,CAAK,MAAM,AAAX,EAAa;EACjB,KAAK,EAAE,IAAK,GACb;;AElBH,AAAA,YAAY,CAAC;EACX,WAAW,EAAE,MAAO,GAUrB;EAXD,AAGU,YAHE,AAGT,MAAM,CAAC,UAAU,CAAC;IACjB,OAAO,EAAE,CAAE,GACZ;EALH,AAOE,YAPU,CAOV,iBAAiB,CAAC;IAChB,OAAO,EAAE,YAAa;IACtB,KAAK,EAAE,IAAK,GACb;;ACVH,AACE,mBADiB,CACjB,cAAc,CAAC;EACb,OAAO,EAAE,KAAM,GAChB",
+	"names": []
+}

@@ -1,0 +1,42 @@
+.adventure-list-item .glyphicon {
+  opacity: 0.2;
+  transition: opacity 500ms; }
+
+.adventure-list-item .glyphicon:hover {
+  opacity: 1; }
+  .adventure-list-item .glyphicon:hover.glyphicon-trash {
+    color: red; }
+  .adventure-list-item .glyphicon:hover.glyphicon-remove {
+    color: orange; }
+  .adventure-list-item .glyphicon:hover.glyphicon-pencil {
+    color: blue; }
+  .adventure-list-item .glyphicon:hover.glyphicon-ok {
+    color: green; }
+
+.adventure-list-item input[type="text"] {
+  width: 100%; }
+
+.adventure-list .glyphicon {
+  opacity: 0.2;
+  transition: opacity 500ms; }
+
+.adventure-list .glyphicon:hover {
+  opacity: 1; }
+  .adventure-list .glyphicon:hover.glyphicon-plus {
+    color: green; }
+
+.adventure-list input[type="text"] {
+  width: 100%; }
+
+.column-head {
+  white-space: nowrap; }
+  .column-head:hover .glyphicon {
+    opacity: 1; }
+  .column-head .icon-placeholder {
+    display: inline-block;
+    width: 14px; }
+
+.bootstrap-dropdown .dropdown-menu {
+  display: block; }
+
+/*# sourceMappingURL=av-frontend.css.map */
