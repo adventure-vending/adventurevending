@@ -6,5 +6,6 @@ export default DS.Model.extend({
   loc: DS.attr('string'),
   type: DS.attr('string'),
   event_type: DS.attr(),
+  coin: DS.attr('boolean', {defaultValue: false }),
   enabled: DS.attr('boolean', { defaultValue: true })
 });

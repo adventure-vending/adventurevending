@@ -21,6 +21,7 @@ export default Ember.Component.extend({
     this.set('viewConfig.showLocation', true);
     this.set('viewConfig.showType', true);
     this.set('viewConfig.showEnabled', true);
+    this.set('viewConfig.showCoin', true);
   },
 
   actions: {
@@ -29,12 +30,13 @@ export default Ember.Component.extend({
       let desc = this.get('newAdventure.desc');
       let loc = this.get('newAdventure.loc');
       let type = this.get('newAdventure.type');
+      let coin = this.get('newAdventure.coin');
 
       if (!title && !desc) {
         return;
       }
 
-      this.get('store').createRecord('adventure', { title, desc, loc, type }).save();
+      this.get('store').createRecord('adventure', { title, desc, loc, type, coin }).save();
 
       this.set('newAdventure', {});
     },
