@@ -15,6 +15,7 @@ from vendingmachine.src.addeventdetection import *
 from vendingmachine.src.input.button import Button
 from logger.logger import Logger
 import api.run
+from tinydb import Query
 
 ##-----------------------------------------------------------------------
 #   Vending Machine
@@ -45,10 +46,11 @@ class VendingMachine(object):
     adventure_knob_b = None
     coin_machine = None
     logger = None
+    api = None
 
     adventure_count = 0
     gift_count = 0
-    adv_types = [["bmapi", 100], ["google_sheet", 0]]
+    adv_types = [["bmapi", 40], ["fun", 10], ["coin", 60]]
 
     def __init__(self):
         GPIO.cleanup()
@@ -62,6 +64,7 @@ class VendingMachine(object):
         self.adventure_knob_b = BinaryKnob(self.box_select_pins_b)
         self.coin_machine = CoinMachine(self.lighting, self.demo_mode)
         self.server = api.run.ServerController()
+        self.api = api.run
 
     # Private -------------------------------------------
 
@@ -165,32 +168,38 @@ class VendingMachine(object):
             t.start()
 
     def get_adventure(self):
-        adventures = api.run.av_data
-        enabled_adventures = []            
+        #adventures = api.run.av_data
+        #enabled_adventures = []            
         adv_type = self.__weighted_choice(self.adv_types)
         time_format = '%Y-%m-%dT%X+00:00'
         #now = datetime.datetime.now()
         now = datetime.datetime.strptime("2016-09-02T18:00:00+00:00", time_format)
-        
-        for adventureid in adventures:
-            adventure = adventures[adventureid]
-            if ('enabled' in adventure) and adventure['enabled'] == False:
-                continue
-            if adventure['event_source'] != adv_type:
-                continue
-            if 'occurrence_set' in adventure:
-                cont = False
-                for event_time in adventure['occurrence_set']:
-                    start_time = datetime.datetime.strptime(event_time["start_time"], time_format)
-                    start_time_minus_hour = start_time - datetime.timedelta(hours=1)
-                    end_time = datetime.datetime.strptime(event_time["end_time"], time_format)
-                    if now < (start_time - datetime.timedelta(hours=1)) or now > (end_time - datetime.timedelta(hours=1)):
-                        cont = True
-                if cont:
-                    continue
-      
-            enabled_adventures.append(adventure)
+        Adventure = Query()
 
+        def adventure_query(val, now, adv_type):
+            return val and val["label"] and val["label"] == "coin"
+
+        def time_query(val, now):
+            match = True
+            if not val:
+                #If something doesn't have a time, then just show it anyways
+                return True
+            for event_time in val:
+                start_time = datetime.datetime.strptime(event_time["start_time"], time_format)
+                start_time_minus_hour = start_time - datetime.timedelta(hours=1)
+                end_time = datetime.datetime.strptime(event_time["end_time"], time_format)
+                if now < (start_time - datetime.timedelta(hours=1)) or now > (end_time - datetime.timedelta(hours=1)):
+                    match = False
+            return match
+
+        if adv_type == "coin":
+            enabled_adventures = self.api.db.search((Adventure["event_type"]["label"] == "coin") & (Adventure.enabled == True))
+        elif adv_type == "fun":
+            enabled_adventures = self.api.db.search((Adventure["event_type"]["label"] == "Fun") & ~(Adventure.desc == ""))
+        else:
+            enabled_adventures = self.api.db.search((Adventure["occurrence_set"].test(time_query, now)) & (Adventure["event_source"] == adv_type))
+        
+        
         return random.choice(enabled_adventures)
 
     def dispense_adventure(self):
@@ -204,6 +213,14 @@ class VendingMachine(object):
             self.printer.printAdventure(adventure)
         self.lighting.dispense_adventure()
 
+    def open_all_boxes(self):
+        for i in range(1, 32):
+            self.box_controller.set_box(i)
+            self.box_controller.open_current_box()
+            time.sleep(1)
+        self.box_controller.close_all_boxes()
+            
+    
     def start(self):
         self.logger.log("Machine: starting")
         self.__start_waiting_for_boxes()

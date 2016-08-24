@@ -5,12 +5,16 @@ import json
 from threading import Thread
 import os
 from logger.logger import Logger
+from tinydb import TinyDB, Query
+import uuid
 
 tmpfilepath = os.path.join(os.path.dirname(__file__), 'avdatatmp')
 
 av_data = {}
+db = TinyDB('/home/pi/vending-core/api/adventuredatabase.json')
 
 logger = Logger()
+last_data = {}
 
 
 class VendingRequestHandler(SimpleHTTPRequestHandler):
@@ -29,19 +33,22 @@ class VendingRequestHandler(SimpleHTTPRequestHandler):
             ignore_dicts=True
         )
 
-    def _update_adventure(self, adventure, newadventure):
-        adventure['title'] = newadventure['title']
-        adventure['desc'] = newadventure['desc']
-        adventure['enabled'] = newadventure['enabled']
+    def _update_adventure(self, newadventure):
+        def transform(element):
+            element['title'] = newadventure['title']
+            element['desc'] = newadventure['desc']
+            element['enabled'] = newadventure['enabled']
+            return element
 
     def _onchange(self):
-        try:
-            os.remove(tmpfilepath)
-        except OSError:
-            pass
-        f = open(tmpfilepath, 'w')
-        f.write(json.dumps(av_data, separators=(',', ':')))
-        f.close()
+        empty = "method"
+        #try:
+        #    os.remove(tmpfilepath)
+        #except OSError:
+        #    pass
+        #f = open(tmpfilepath, 'w')
+        #f.write(json.dumps(av_data, separators=(',', ':')))
+        #f.close()
 
     def _byteify(self, data, ignore_dicts=False):
         # if this is a unicode string, return its string representation
@@ -64,9 +71,12 @@ class VendingRequestHandler(SimpleHTTPRequestHandler):
         self._set_headers()
         self.send_header('Content-type', 'application/json')
         self.end_headers()
+        Adventure = Query()
         if self.path == '/api/adventures':
             logger.log("  returning adventures")
-            adventures_data = json.dumps(av_data.values()[0:10])
+            adventures = db.search((Adventure.event_source == "google_sheet") & ~( Adventure.desc == ""))
+            adventures_data = json.dumps(adventures)
+            #adventures_data = json.dumps(av_data.values()[0:10])
             logger.log(adventures_data)
             self.wfile.write('{"adventures":' + adventures_data + '}')
         elif self.path.startswith('/api/adventures?'):
@@ -74,7 +84,7 @@ class VendingRequestHandler(SimpleHTTPRequestHandler):
             logger.log("  returning adventures with paging %s" % page_to_get)
             start_index = 10 * page_to_get
             end_index = start_index + 10
-            paged_adventures_data = json.dumps(av_data.values()[start_index:end_index])
+            #paged_adventures_data = json.dumps(av_data.values()[start_index:end_index])
             logger.log(paged_adventures_data)
             self.wfile.write('{"adventures":' + paged_adventures_data + '}')
         elif self.path.startswith('/api/adventures/'):
@@ -82,7 +92,11 @@ class VendingRequestHandler(SimpleHTTPRequestHandler):
             id_to_get = self.path[16:]
             logger.log("  returning adventure with id: %s" % id_to_get)
 
-            adventure_to_get = av_data[id_to_get]
+            try:
+                adventure_to_get = db.search(Adventure.id == id_to_get)[0]
+            except IndexError:
+                pass
+            #adventure_to_get = av_data[id_to_get]
 
             if adventure_to_get != None:
                 logger.log("  found adventure and returning")
@@ -96,10 +110,16 @@ class VendingRequestHandler(SimpleHTTPRequestHandler):
         self.end_headers()
 
         data_string = self.rfile.read(int(self.headers['Content-Length']))
+        logger.log("%s" % data_string)
         post_data = self._json_loads_byteified(data_string)
-
+        last_data = post_data
+        
         if post_data.has_key('adventure'):
-            av_data['adventures'].append(post_data['adventure'])
+            #av_data[post_data['adventure']['id']] = post_data['adventure']
+            adventure = post_data['adventure']
+            adventure["event_source"] = "google_sheet"
+            adventure["id"] = str(uuid.uuid4())
+            db.insert(adventure)
 
         self.wfile.write('{}')
         self._onchange()
@@ -111,13 +131,36 @@ class VendingRequestHandler(SimpleHTTPRequestHandler):
 
         data_string = self.rfile.read(int(self.headers['Content-Length']))
         put_data = self._json_loads_byteified(data_string)
+        Adventure = Query()
 
         if self.path.startswith('/api/adventures/'):
             id_to_update = self.path[16:]
+            try:
+                idnumber = int(id_to_update)
+                id_to_update = idnumber
+            except ValueError:
+                id_to_updated = id_to_update
+                #keep it as a string...
+            adventure = db.search(Adventure.id == id_to_update)[0]
+            new_adventure = put_data['adventure']
+            db.remove(Adventure.id == id_to_update)
+            adventure['title'] = new_adventure['title']
+            adventure['desc'] = new_adventure['desc']
+            adventure['enabled'] = new_adventure['enabled']
+            adventure['type'] = new_adventure['type']
+            if not "event_type" in adventure:
+                adventure['event_type'] = {}
+            adventure['event_type']['label'] = new_adventure['type']
+            adventure['loc'] = new_adventure['loc']
+            
+            db.insert(adventure)
+            #adventure = db.search(Adventure.id == id_to_update)[0]
+            #db.update(self._update_adventure(put_data['adventure']), Adventure.id == id_to_update)
 
-            for adventure in av_data['adventures']:
-                if adventure['id'] == id_to_update:
-                    self._update_adventure(adventure, put_data['adventure'])
+            #for adventureid in av_data:
+            #    adventure = av_data[adventureid]
+            #    if adventure['id'] == id_to_update:
+            #        self._update_adventure(adventure, put_data['adventure'])
 
         self.wfile.write('{}')
         self._onchange()
@@ -135,11 +178,16 @@ class VendingRequestHandler(SimpleHTTPRequestHandler):
 
         # get id
         params = self.path.split('/')
+        last_data = params
         record_id = params[3]
+        Adventure = Query()
+        db.remove(Adventure.id == record_id)
 
-        if params[2] == 'adventures':
-            adventure_record = [x for x in av_data['adventures'] if x['id'] == record_id][0]
-            av_data['adventures'].remove(adventure_record)
+        #if params[2] == 'adventures':
+            #for adventureid in av_data:
+                #adventure = av_data[adventureid]
+                #if adventure["id"] == record_id:
+                    #av_data.remove(adventure_record)
 
         self.wfile.write('{}')
         self._onchange()
@@ -151,6 +199,12 @@ try:
 except IOError:
     pass
 
+if len(db) == 0:
+    for adventureid in av_data:
+        adventure = av_data[adventureid]
+        db.insert(adventure)
+
+del av_data
 
 HandlerClass = VendingRequestHandler
 ServerClass = BaseHTTPServer.HTTPServer
