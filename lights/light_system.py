@@ -10,6 +10,18 @@ from kinet import *
 
 #TODO, fix but in kinet library that chooses wifi interface when avalible
 
+
+
+
+
+
+
+
+
+
+
+
+
 class LightSystem(multiprocessing.Process):
     pds = None
     box = None
@@ -55,6 +67,25 @@ class LightSystem(multiprocessing.Process):
             for idx, fixture in enumerate(self.pds):
                 ratio += (step + idx * div) % steps / float(steps)
                 fixture.hsv = (ratio, 1.0, 1.0)
+            print self.pds
+            self.pds.go()
+            time.sleep(pause)
+            while True:
+                print "in idle mode"
+                sleep(.3)
+
+    def idle_columns(self):
+        pause=.1
+        steps=1000
+        div = steps / len(self.pds)
+        print "starting idle"
+        for step in range(steps):
+            ratio = 0
+            for idx, fixture in enumerate(self.pds):
+                ratio += (step + idx * div) % steps / float(steps)
+                fixture.hsv = (ratio, 1.0, 1.0)
+
+
             print self.pds
             self.pds.go()
             time.sleep(pause)
