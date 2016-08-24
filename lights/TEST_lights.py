@@ -524,6 +524,32 @@ def rainbowFade(pause, steps):
             pds.go()
             time.sleep(pause)
 
+def rowColorShuffle(pause, color1, color2, color3, color4):
+  rowColor(color1, color2, color3, color4)
+  sleep(pause)
+  rowColor(color4, color1, color2, color3)
+  sleep(pause)
+  rowColor(color3, color4, color1, color2)
+  sleep(pause)
+  rowColor(color2, color3, color4, color1)
+  sleep(pause)
+
+def columnColorShuffle(pause, color1, color2, color3, color4, color5, color6, color7):
+  columnColor(color1, color2, color3, color4, color5, color6, color7)
+  sleep(pause)
+  columnColor(color7, color1, color2, color3, color4, color5, color6)
+  sleep(pause)
+  columnColor(color6, color7, color1, color2, color3, color4, color5)
+  sleep(pause)
+  columnColor(color5, color6, color7, color1, color2, color3, color4)
+  sleep(pause)
+  columnColor(color4, color5, color6, color7, color1, color2, color3)
+  sleep(pause)
+  columnColor(color3, color4, color5, color6, color7, color1, color2)
+  sleep(pause)
+  columnColor(color2, color3, color4, color5, color6, color7, color1)
+  sleep(pause)
+
 def checkerBox2shuffle(pause, color1, color2):
   checkerBox2(color1, color2)
   sleep(pause)
@@ -544,22 +570,23 @@ def checkerBox4shuffle(pause, color1, color2, color3, color4):
   checkerBox4(color2, color3, color4, color1)
   sleep(pause)
 
-
 def runRandom():
   random.choice([checkerBox2shuffle(10, purple, orange),
                 checkerBox4shuffle(10, purple, orange, green, blue),
                 rainbowBasicBitch(0.1, 100),
                 rainbowBasic(0.1, 100),
-                rainboxFade(0.1, 100)
+                rainboxFade(0.1, 100),
+                columnColorShuffle(10, red, orange, yellow, green, blue, purple, pink),
+                rowColorShuffle(10, orange, purple, yellow, green)
                 ])
 
 
-
+#set how long of a random lightshow you want, default is 15mins
 t_end = time.time() + 60 * 15
 while time.time() < t_end:
     runRandom()
 
-
+    #List of all routines
     #allBlack()
     #allWhite()
     #allColor(pink)
@@ -572,3 +599,5 @@ while time.time() < t_end:
     #checkerBox4(orange, pink, yellow , purple)
     #checkerBox2shuffle(10, purple, orange)
     #checkerBox4shuffle(1, purple, orange, green, blue)
+    #columnColorShuffle(10, red, orange, yellow, green, blue, purple, pink),
+    #rowColorShuffle(10, orange, purple, yellow, green)
